@@ -11,6 +11,7 @@ class Line {
 	private $image;
 	private $short;
 	private $long;
+	private $published;
 
 	public function getTitle() {
 		return $this -> title;
@@ -22,8 +23,22 @@ class Line {
 	}
 
 	/**
+	 * getPublished
+	 *
+	 * Returns the published date in pretty format :)
+	 *
+	 * @return string
+	 */
+	public function getPublished() {
+		$time = DateTime::createFromFormat( 'U', $this -> published );
+		return $time -> format('Y-m-d H:i:s');
+	}
+
+	/**
 	 * getShort
+	 *
 	 * Get the short text
+	 *
 	 * @param bool $html If set to true tries to convert the text from XML to HTML
 	 * @return string
 	 */
@@ -37,7 +52,9 @@ class Line {
 
 	/**
 	 * getlong
+	 *
 	 * Get the long text
+	 *
 	 * @param bool $html If set to true tries to convert the text from XML to HTML
 	 * @return string
 	 */
@@ -57,6 +74,10 @@ class Line {
 		$this -> image = $a;
 	}
 
+	public function setPublished($a) {
+		$this -> published = $a;
+	}
+
 	public function setShort($a) {
 		$this -> short = $a;
 	}
@@ -67,6 +88,7 @@ class Line {
 
 	/**
 	 * clearLine
+	 *
 	 * Emptys the object
 	 */
 	public function clearLine() {
@@ -74,6 +96,7 @@ class Line {
 		$this -> image = '';
 		$this -> short = '';
 		$this -> long = '';
+		$this -> published = 0;
 	}
 
 	public function debugImage() {
@@ -84,32 +107,39 @@ class Line {
 	public function printLine() {
 		//TODO Controlar que tots els camps estiguin plens i fer un log de problemes
 		echo "<pre>";
-		echo 'TITLE:' . $this -> getTitle() . ';';
-		echo 'IMAGE:' . $this -> getImage() . ';';
-		echo 'SHORT:' . $this -> getShort() . ';';
-		echo 'LONG:' . $this -> getLong();
+		echo 'TITLE:' . $this -> getTitle() . '<br>';
+		echo 'IMAGE:' . $this -> getImage() . '<br>';
+		echo 'SHORT:' . $this -> getShort() . '<br>';
+		echo 'LONG:' . $this -> getLong() . '<br>';
+		echo 'PUBLISHED:' . $this -> getPublished();
 		echo "</pre><br />";
 	}
 
 	/**
 	 * printLineCSV
+	 *
 	 * Echoes this line in CSV format or with the specified char.
+	 *
 	 * @param char $sC Separator character
 	 */
 	public function printLineCSV($sC = ';') {
 		echo $this -> getTitle() . $sC;
 		echo $this -> getImage() . $sC;
 		echo $this -> getShort() . $sC;
-		echo $this -> getLong();
+		echo $this -> getLong() . $sC;
+		echo $this -> getPublished();
 	}
 
 	/**
 	 * xmlToHtml
+	 *
 	 * Converts EZ xml to HTML using the ez functions
+	 *
 	 * @return string
 	 */
 	private function xmlToHtml($XMLContent) {
-		$outputHandler = new eZXHTMLXMLOutput($XMLContent, false);
+		$GoodContent = utf8_encode($XMLContent);
+		$outputHandler = new eZXHTMLXMLOutput($GoodContent, false);
 		$html = &$outputHandler -> outputText();
 		return $html;
 	}

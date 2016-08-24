@@ -1,6 +1,6 @@
 <?php
 // Cargamos los ficheros necesarios
-require 'autoload.php';
+require '../autoload.php';
 require 'inc/Line.php';
 
 $mysqli = new mysqli("127.0.0.1", "root", "root", "madrid");
@@ -13,7 +13,7 @@ if ($mysqli -> connect_errno) {
 
 
 /* Consultas de selección que devuelven un conjunto de resultados */
-$query = "SELECT o.id,o.name,o.section_id,a.data_int,a.data_text ,a.data_type_string,a.version,c.identifier
+$query = "SELECT o.id,o.name,o.section_id,a.data_int,a.data_text ,a.data_type_string,a.version,c.identifier, published
 		FROM `ezcontentobject` o
 		inner join ezcontentobject_attribute a on o.id = a.contentobject_id
 		inner join ezcontentclass_attribute c on a.contentclassattribute_id = c.id
@@ -38,6 +38,9 @@ if ($result = $mysqli->query($query, MYSQLI_USE_RESULT)) {
 			$line -> clearLine();
 			$id = $row -> id;
 		}
+
+		//Omplim els camps fixes de la linia
+		$line -> setPublished($row -> published);
 
 		// Omplim el camp que toca d'aquesta linia
 		switch ($row -> identifier) {
