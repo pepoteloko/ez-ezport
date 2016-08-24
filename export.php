@@ -1,14 +1,13 @@
 <?php
-
+// Cargamos los ficheros necesarios
 require 'autoload.php';
-
-//$kernel = new ezpKernel( new ezpKernelWeb() );
+require 'inc/Line.php';
 
 $mysqli = new mysqli("127.0.0.1", "root", "root", "madrid");
 
 /* comprobar la conexión */
-if ($mysqli->connect_errno) {
-	printf("Falló la conexión: %s\n", $mysqli->connect_error);
+if ($mysqli -> connect_errno) {
+	printf("Falló la conexión: %s\n", $mysqli -> connect_error);
 	exit();
 }
 
@@ -27,7 +26,7 @@ if ($result = $mysqli->query($query, MYSQLI_USE_RESULT)) {
 	$line = new Line();
 
 	// Cycle through results
-	while ($row = $result->fetch_object()){
+	while ($row = $result -> fetch_object()){
 
 		if($id == 0) {
 			// Cas especial 1 volta
@@ -65,74 +64,4 @@ if ($result = $mysqli->query($query, MYSQLI_USE_RESULT)) {
 }
 
 $mysqli->close();
-
-class Line {
-	private $title;
-	private $image;
-	private $short;
-	private $long;
-
-	public function getTitle() {
-		return $this -> title;
-	}
-	public function getImage() {
-		$image = new SimpleXMLElement($this -> image);
-		return $image['url'] . 'jpg';
-	}
-	public function getShort($html = true) {
-		if($html) {
-			return $this -> xmlToHtml($this -> short);
-		} else {
-			return $this -> short;
-		}
-	}
-	public function getLong($html = true) {
-		if($html) {
-			return $this -> xmlToHtml($this -> long);
-		} else {
-			return $this -> long;
-		}
-	}
-
-	public function setTitle($a) {
-		$this -> title = $a;
-	}
-	public function setImage($a) {
-		$this -> image = $a;
-	}
-	public function setShort($a) {
-		$this -> short = $a;
-	}
-	public function setLong($a) {
-		$this -> long = $a;
-	}
-
-	public function clearLine() {
-		$this -> title = '';
-		$this -> image = '';
-		$this -> short = '';
-		$this -> long = '';
-	}
-
-	public function debugImage() {
-		$image = new SimpleXMLElement($this -> image);
-		print_r($image);
-	}
-
-	public function printLine() {
-		//TODO Controlar que tots els camps estiguin plens i fer un log de problemes
-		echo "<pre>";
-		echo 'TITLE:' . $this -> getTitle() . ';';
-		echo 'IMAGE:' . $this -> getImage()  . ';';
-		//echo 'SHORT:' . $this -> getShort()  . ';';
-		//echo 'LONG:' . $this -> getLong();
-		echo "</pre><br />";
-	}
-
-	private function xmlToHtml($XMLContent) {
-		$outputHandler = new eZXHTMLXMLOutput( $XMLContent, false );
-		$html =& $outputHandler -> outputText();
-		return $html;
-	}
-}
 ?>
