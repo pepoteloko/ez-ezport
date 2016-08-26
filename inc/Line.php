@@ -118,16 +118,23 @@ class Line {
 	/**
 	 * printLineCSV
 	 *
-	 * Echoes this line in CSV format or with the specified char.
+	 * Return line in CSV format or with the specified char.
+	 * All the fields goes between " and comma separated
 	 *
 	 * @param char $sC Separator character
+	 * @return string
 	 */
-	public function printLineCSV($sC = ';') {
-		echo $this -> getTitle() . $sC;
-		echo $this -> getImage() . $sC;
-		echo $this -> getShort() . $sC;
-		echo $this -> getLong() . $sC;
-		echo $this -> getPublished();
+	public function printLineCSV($sC = ',') {
+		// $titols = '"post_title","post_excerpt","post_content","post_categories","post_date","post_type","post_thumbnail"
+		$linia  = '"' . $this -> getTitle() . '"' . $sC;
+		$linia .= '"' . $this -> getShort() . '"' . $sC;
+		$linia .= '"' . $this -> getLong() . '"' . $sC;
+		$linia .= '"Noticias"' . $sC;
+		$linia .= '"' . $this -> getPublished() . '"' . $sC;
+		$linia .= '"post"' . $sC;
+		$linia .= '"' . $this -> getImage() . '"';
+
+		return $linia;
 	}
 
 	/**
@@ -137,11 +144,18 @@ class Line {
 	 *
 	 * @return string
 	 */
-	private function xmlToHtml($XMLContent) {
+	public function xmlToHtml($XMLContent) {
+		$proc = new XsltProcessor();
+		$xslt = new DOMDocument();
+		$xml = new DOMDocument();
+
 		$GoodContent = utf8_encode($XMLContent);
-		$outputHandler = new eZXHTMLXMLOutput($GoodContent, false);
-		$html = &$outputHandler -> outputText();
-		return $html;
+		$GoodContent = iconv('UTF-8', 'UTF-8//IGNORE', $XMLContent);
+
+		$xslt -> load("inc/map.xslt");
+		$proc -> importStylesheet($xslt);
+
+		return $proc -> transformToXML($xml);
 	}
 
 }
