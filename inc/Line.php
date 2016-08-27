@@ -13,6 +13,12 @@ class Line {
 	private $long;
 	private $published;
 
+	private $proc;
+
+	public function __construct() {
+		$this -> proc = new XsltProcessor();
+	}
+
 	public function getTitle() {
 		return $this -> title;
 	}
@@ -44,7 +50,7 @@ class Line {
 	 */
 	public function getShort($html = true) {
 		if ($html) {
-			return $this -> xmlToHtml($this -> short);
+			return $this -> xmlToHtml($this -> short, 'short');
 		} else {
 			return $this -> short;
 		}
@@ -60,7 +66,7 @@ class Line {
 	 */
 	public function getLong($html = true) {
 		if ($html) {
-			return $this -> xmlToHtml($this -> long);
+			return substr($this -> xmlToHtml($this -> long, 'long'), 0, -1);
 		} else {
 			return $this -> long;
 		}
@@ -125,13 +131,13 @@ class Line {
 	 * @return string
 	 */
 	public function printLineCSV($sC = ',') {
-		// $titols = '"post_title","post_excerpt","post_content","post_categories","post_date","post_type","post_thumbnail"
+		// $titols = '"post_title","post_type","post_categories","post_excerpt","post_content","post_date","post_thumbnail"
 		$linia  = '"' . $this -> getTitle() . '"' . $sC;
+		$linia .= '"post"' . $sC;
+		$linia .= '"noticias"' . $sC;
 		$linia .= '"' . $this -> getShort() . '"' . $sC;
 		$linia .= '"' . $this -> getLong() . '"' . $sC;
-		$linia .= '"Noticias"' . $sC;
 		$linia .= '"' . $this -> getPublished() . '"' . $sC;
-		$linia .= '"post"' . $sC;
 		$linia .= '"' . $this -> getImage() . '"';
 
 		return $linia;
@@ -142,20 +148,27 @@ class Line {
 	 *
 	 * Converts EZ xml to HTML using the ez functions
 	 *
+	 * @param $XMLContent string XML content
+	 * @param $type [long|short] Indicate if is excerpt or body
 	 * @return string
 	 */
-	public function xmlToHtml($XMLContent) {
-		$proc = new XsltProcessor();
+	private function xmlToHtml($XMLContent, $type) {
 		$xslt = new DOMDocument();
 		$xml = new DOMDocument();
 
 		$GoodContent = utf8_encode($XMLContent);
 		$GoodContent = iconv('UTF-8', 'UTF-8//IGNORE', $XMLContent);
 
-		$xslt -> load("inc/map.xslt");
-		$proc -> importStylesheet($xslt);
+		$xml -> loadXML($GoodContent);
 
-		return $proc -> transformToXML($xml);
+		if ($type == 'short') {
+			$xslt -> load("inc/excerpt.xslt");
+		} else {
+			$xslt -> load("inc/map.xslt");
+		}
+		$this -> proc -> importStylesheet($xslt);
+
+		return $this -> proc -> transformToXML($xml);
 	}
 
 }

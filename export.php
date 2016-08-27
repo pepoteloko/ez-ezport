@@ -42,7 +42,8 @@
 				FROM `ezcontentobject` o
 				inner join ezcontentobject_attribute a on o.id = a.contentobject_id
 				inner join ezcontentclass_attribute c on a.contentclassattribute_id = c.id
-				where o.id in (867, 868, 869, 870, 871) and data_text <> ''";
+				where o.id in (868, 24302) and data_text <> ''
+				AND o.current_version = a.version -- Coje la versión actual";
 
 		}
 
@@ -63,7 +64,12 @@
 				}
 
 				if($id != $row -> id) {
-					$fichero -> saveLine($line -> printLineCSV());
+					try {
+						$fichero -> saveLine($line -> printLineCSV());
+					} catch (Exception $e) {
+						echo "Line: " . $row -> id;
+					}
+
 					$line -> clearLine();
 					$id = $row -> id;
 				}
@@ -92,12 +98,17 @@
 			$result -> close();
 
 			// L'últim queda penjat
-			$fichero -> saveLine($line -> printLineCSV());
+			try {
+				$fichero -> saveLine($line -> printLineCSV());
+			} catch (Exception $e) {
+				echo "Line: " . $id;
+			}
 		}
 
-		$mysqli->close(); ?>
-		<p>Proceso Finalizado</p>
+		$mysqli->close();
 
-		<p>php bin/php/ezcsvexport.php 2541 -v --storage-dir=/Users/pepe/Web/madrid/export/files -l admin -p kuluxka -r --debug=all</p>
+		//<p>php bin/php/ezcsvexport.php 2541 -v --storage-dir=/Users/pepe/Web/madrid/export/files -l admin -p kuluxka -r --debug=all</p>
+		?>
+		<p>Proceso Finalizado</p>
 	</body>
 </html>

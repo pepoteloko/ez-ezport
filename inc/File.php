@@ -72,10 +72,10 @@ class File {
 
 	private function startFile() {
 		// Obrir
-		echo "<p>Creado fichero " .$this -> rotate . ".csv</p>\n";
+		echo "\t\t<p>Creado fichero " .$this -> rotate . ".csv</p>\n";
 		$this -> fichero = fopen(self::FILE_PATH . $this -> rotate . ".csv", "w");
 		// Pintar titols
-		$titols = '"post_title","post_excerpt","post_content","post_categories","post_date","post_type","post_thumbnail"';
+		$titols = '"post_title","post_type","post_category","post_excerpt","post_content","post_date","post_thumbnail"';
 		$this -> saveLine($titols);
 	}
 
