@@ -75,6 +75,7 @@
 				}
 
 				//Omplim els camps fixes de la linia
+				$line -> setId($row -> id);
 				$line -> setPublished($row -> published);
 
 				// Omplim el camp que toca d'aquesta linia

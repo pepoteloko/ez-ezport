@@ -7,6 +7,7 @@
  * @package Eka
  */
 class Line {
+	private $post_id;
 	private $title;
 	private $image;
 	private $short;
@@ -17,6 +18,10 @@ class Line {
 
 	public function __construct() {
 		$this -> proc = new XsltProcessor();
+	}
+
+	public function getID() {
+		return $this -> post_id;
 	}
 
 	public function getTitle() {
@@ -70,6 +75,10 @@ class Line {
 		} else {
 			return $this -> long;
 		}
+	}
+
+	public function setId($a) {
+		$this -> post_id = $a;
 	}
 
 	public function setTitle($a) {
@@ -131,14 +140,16 @@ class Line {
 	 * @return string
 	 */
 	public function printLineCSV($sC = ',') {
-		// $titols = '"post_title","post_type","post_categories","post_excerpt","post_content","post_date","post_thumbnail"
-		$linia  = '"' . $this -> getTitle() . '"' . $sC;
+		//$titols = '"post_id","post_title","post_type","post_status","post_date","post_category","post_thumbnail","post_excerpt","post_content"';
+		$linia  = '"post_id"' . $sC;
+		$linia .= '"' . $this -> getTitle() . '"' . $sC;
 		$linia .= '"post"' . $sC;
-		$linia .= '"noticias"' . $sC;
-		$linia .= '"' . $this -> getShort() . '"' . $sC;
-		$linia .= '"' . $this -> getLong() . '"' . $sC;
+		$linia .= '"publish"' . $sC;
 		$linia .= '"' . $this -> getPublished() . '"' . $sC;
-		$linia .= '"' . $this -> getImage() . '"';
+		$linia .= '"noticias"' . $sC;
+		$linia .= '"' . $this -> getImage() . '"' . $sC;
+		$linia .= '"' . $this -> getShort() . '"' . $sC;
+		$linia .= '"' . $this -> getLong() . '"';
 
 		return $linia;
 	}

@@ -75,7 +75,7 @@ class File {
 		echo "\t\t<p>Creado fichero " .$this -> rotate . ".csv</p>\n";
 		$this -> fichero = fopen(self::FILE_PATH . $this -> rotate . ".csv", "w");
 		// Pintar titols
-		$titols = '"post_title","post_type","post_category","post_excerpt","post_content","post_date","post_thumbnail"';
+		$titols = '"post_id","post_title","post_type","post_status","post_date","post_category","post_thumbnail","post_excerpt","post_content"';
 		$this -> saveLine($titols);
 	}
 
