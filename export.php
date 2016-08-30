@@ -6,6 +6,7 @@
 		<p>Empezamos el proceso</p>
 		<?php
 		// Cargamos los ficheros necesarios
+		require 'inc/Log.php';
 		require 'inc/Line.php';
 		require 'inc/File.php';
 
@@ -27,7 +28,7 @@
 
 
 		/* Consultas de selección que devuelven un conjunto de resultados */
-		$largo = false;
+		$largo = true;
 		if ($largo) {
 			$query = "SELECT o.id,o.name,o.section_id,a.data_int,a.data_text ,a.data_type_string,a.version,c.identifier, published
 				FROM ezcontentobject o inner join ezcontentobject_attribute a on o.id = a.contentobject_id
@@ -50,7 +51,7 @@
 		if ($result = $mysqli->query($query)) {
 
 			$id = 0;
-			$line = new Line();
+			$line = new Line($mysqli);
 			$fichero = new File();
 
 
@@ -90,7 +91,7 @@
 						$line -> setShort($row -> data_text);
 						break;
 					case 'cuerpo':
-						$line -> setLong($row -> data_text, $mysqli);
+						$line -> setLong($row -> data_text);
 						break;
 				}
 			}

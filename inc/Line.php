@@ -14,10 +14,17 @@ class Line {
 	private $long;
 	private $published;
 
+	private $Log;
 	private $proc;
+	private $sql;
 
-	public function __construct() {
+	/**
+	 * @param mysqli $sql
+	 */
+	public function __construct(mysqli $sql) {
 		$this -> proc = new XsltProcessor();
+		$this -> Log = new Log();
+		$this -> sql = $sql;
 	}
 
 	public function getID() {
@@ -58,10 +65,11 @@ class Line {
 	 */
 	public function getShort($html = true) {
 		if ($html) {
-			return $this -> xmlToHtml($this -> short, 'short');
+			$text = $this -> xmlToHtml($this -> short, 'short');
 		} else {
-			return $this -> short;
+			$text = $this -> short;
 		}
+		return str_replace('"', '”', $text);
 	}
 
 	/**
@@ -73,11 +81,29 @@ class Line {
 	 * @return string
 	 */
 	public function getLong($html = true) {
+		$textXML = $this -> long;
+
 		if ($html) {
-			return substr($this -> xmlToHtml($this -> long, 'long'), 0, -1);
+			$text = substr($this -> xmlToHtml($this -> long, 'long'), 0, -1);
 		} else {
-			return $this -> long;
+			$text = $this -> long;
 		}
+
+		// Check for Links -> Change ID for URL
+		$data = new SimpleXMLElement($textXML);
+		foreach ($data -> xpath('//link') as $enlace) {
+			$query = "SELECT * FROM ezurl WHERE id = " . $enlace['url_id'];
+			$a = $this -> sql -> query($query);
+			$link = $a -> fetch_object();
+			if ($a -> num_rows == 0) {
+				$this -> Log -> writeLineError($this, "Link no existe " . $enlace['url_id']);
+			} else {
+				$text = str_ireplace('url_id="' . $enlace['url_id'] . '">', 'url_id="' . $link -> url . '">', $text);
+			}
+			$a -> close();
+		}
+
+		return str_replace('"', '”', $text);
 	}
 
 	public function setId($a) {
@@ -85,7 +111,7 @@ class Line {
 	}
 
 	public function setTitle($a) {
-		$this -> title = $a;
+		$this -> title = str_replace('"', '”', $a);
 	}
 
 	public function setImage($a) {
@@ -103,26 +129,10 @@ class Line {
 	/**
 	 * setLong
 	 *
-	 * Recevies the EZ xml content and store to text_long and prepares links.
-	 * Changes the ID of the links for their URL.
-	 *
 	 * @param string $xml
-	 * @param mysqli $mysqli Database conection
 	 */
-	public function setLong($xml, mysqli $mysqli) {
-		$text = $xml;
-
-		// Check for Links -> Change ID for URL
-		$data = new SimpleXMLElement($xml);
-		foreach ($data -> xpath('//link') as $enlace) {
-			$query = "SELECT * FROM ezurl WHERE id = " . $enlace['url_id'];
-			$a = $mysqli -> query($query);
-			$link = $a -> fetch_object();
-			$text = str_ireplace('url_id="' . $enlace['url_id'] . '">', 'url_id="' . $link -> url . '">', $text);
-			$a -> close();
-		}
-
-		$this -> long = $text;
+	public function setLong($xml) {
+		$this -> long = $xml;
 	}
 
 	/**
@@ -164,6 +174,13 @@ class Line {
 	 * @return string
 	 */
 	public function printLineCSV($sC = ',') {
+		// Control errores
+		if ($this -> long == "") {
+			$this -> Log -> writeLineError($this, "Cuerpo vacio");
+		} elseif($this -> short == "") {
+			$this -> Log -> writeLineError($this, "Excerpt vacio");
+		}
+
 		//$titols = '"post_id","post_title","post_type","post_status","post_date","post_category","post_thumbnail","post_excerpt","post_content"';
 		$linia  = '"' . $this -> post_id . '"' . $sC;
 		$linia .= '"' . $this -> getTitle() . '"' . $sC;
@@ -194,7 +211,9 @@ class Line {
 		$GoodContent = utf8_encode($XMLContent);
 		$GoodContent = iconv('UTF-8', 'UTF-8//IGNORE', $XMLContent);
 
-		$xml -> loadXML($GoodContent);
+		if(!$xml -> loadXML($GoodContent)) {
+			$this -> Log -> writeLineError($this, "Error al cargar el XML $type" . $GoodContent);
+		}
 
 		if ($type == 'short') {
 			$xslt -> load("inc/excerpt.xslt");
