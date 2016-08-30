@@ -40,7 +40,11 @@ class Line {
 
 		$image = new SimpleXMLElement($this -> image);
 
-		return $domain . $image['url'];
+		if ($image['url'] != "") {
+			return $domain . $image['url'];
+		} else {
+			return "";
+		}
 	}
 
 	/**
