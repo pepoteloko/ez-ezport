@@ -33,6 +33,17 @@
 		<xsl:apply-templates />
 		</h2>
 	</xsl:template>
+	<xsl:template match="link">
+		<xsl:element name="a">
+			<xsl:attribute name="href">
+				<xsl:value-of select="@url_id"/>
+			</xsl:attribute>
+			<xsl:attribute name="target">
+				<xsl:value-of select="@target"/>
+			</xsl:attribute>
+			<xsl:apply-templates />
+		</xsl:element>
+	</xsl:template>
 	<!--
 		Estos en teoria como son igual en HTML podemos omitirlos pues deberian copiarse igual que estan en el origen
 	<xsl:template match="ul">

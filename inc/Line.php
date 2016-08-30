@@ -29,8 +29,11 @@ class Line {
 	}
 
 	public function getImage() {
+		$domain = 'http://aavvmadrid.org/';
+
 		$image = new SimpleXMLElement($this -> image);
-		return $image['url'] . 'jpg';
+
+		return $domain . $image['url'];
 	}
 
 	/**
@@ -97,8 +100,29 @@ class Line {
 		$this -> short = $a;
 	}
 
-	public function setLong($a) {
-		$this -> long = $a;
+	/**
+	 * setLong
+	 *
+	 * Recevies the EZ xml content and store to text_long and prepares links.
+	 * Changes the ID of the links for their URL.
+	 *
+	 * @param string $xml
+	 * @param mysqli $mysqli Database conection
+	 */
+	public function setLong($xml, mysqli $mysqli) {
+		$text = $xml;
+
+		// Check for Links -> Change ID for URL
+		$data = new SimpleXMLElement($xml);
+		foreach ($data -> xpath('//link') as $enlace) {
+			$query = "SELECT * FROM ezurl WHERE id = " . $enlace['url_id'];
+			$a = $mysqli -> query($query);
+			$link = $a -> fetch_object();
+			$text = str_ireplace('url_id="' . $enlace['url_id'] . '">', 'url_id="' . $link -> url . '">', $text);
+			$a -> close();
+		}
+
+		$this -> long = $text;
 	}
 
 	/**
@@ -141,7 +165,7 @@ class Line {
 	 */
 	public function printLineCSV($sC = ',') {
 		//$titols = '"post_id","post_title","post_type","post_status","post_date","post_category","post_thumbnail","post_excerpt","post_content"';
-		$linia  = '"post_id"' . $sC;
+		$linia  = '"' . $this -> post_id . '"' . $sC;
 		$linia .= '"' . $this -> getTitle() . '"' . $sC;
 		$linia .= '"post"' . $sC;
 		$linia .= '"publish"' . $sC;

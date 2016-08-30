@@ -6,7 +6,6 @@
 		<p>Empezamos el proceso</p>
 		<?php
 		// Cargamos los ficheros necesarios
-		require '../autoload.php';
 		require 'inc/Line.php';
 		require 'inc/File.php';
 
@@ -42,13 +41,13 @@
 				FROM `ezcontentobject` o
 				inner join ezcontentobject_attribute a on o.id = a.contentobject_id
 				inner join ezcontentclass_attribute c on a.contentclassattribute_id = c.id
-				where o.id in (868, 24302) and data_text <> ''
+				where o.id in (868, 24302, 29845, 29779) and data_text <> ''
 				AND o.current_version = a.version -- Coje la versión actual";
 
 		}
 
 		/* Si se ha de recuperar una gran cantidad de datos se emplea MYSQLI_USE_RESULT */
-		if ($result = $mysqli->query($query, MYSQLI_USE_RESULT)) {
+		if ($result = $mysqli->query($query)) {
 
 			$id = 0;
 			$line = new Line();
@@ -91,7 +90,7 @@
 						$line -> setShort($row -> data_text);
 						break;
 					case 'cuerpo':
-						$line -> setLong($row -> data_text);
+						$line -> setLong($row -> data_text, $mysqli);
 						break;
 				}
 			}
