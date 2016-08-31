@@ -14,11 +14,20 @@ class File {
 	private $line;
 	private $fichero;
 	private $rotate;
+	private $name;
+	private $title;
 
-	public function __construct() {
+	/**
+	 * File
+	 *
+	 * @param string File name, posts by default
+	 */
+	public function __construct($name = 'posts', $title = '') {
 		// Initial values
 		$this -> line = 0;
 		$this -> rotate = 1;
+		$this -> name = $name;
+		$this -> title = $title;
 
 		$this -> cleanDirectory();
 		$this -> startFile();
@@ -63,7 +72,7 @@ class File {
 	 * Deletes all the files from the export directory
 	 */
 	private function cleanDirectory() {
-		$files = glob(self::FILE_PATH . '*.csv'); // get all file names
+		$files = glob(self::FILE_PATH . $this -> name . '*.csv'); // get all file names
 		foreach($files as $file) { // iterate files
 			if(is_file($file))
 				unlink($file); // delete file
@@ -72,11 +81,10 @@ class File {
 
 	private function startFile() {
 		// Obrir
-		echo "\t\t<p>Creado fichero " .$this -> rotate . ".csv</p>\n";
-		$this -> fichero = fopen(self::FILE_PATH . $this -> rotate . ".csv", "w");
+		echo "\t\t<p>Creado fichero " . $this -> name . $this -> rotate . ".csv</p>\n";
+		$this -> fichero = fopen(self::FILE_PATH . $this -> name . $this -> rotate . ".csv", "w");
 		// Pintar titols
-		$titols = '"post_id","post_title","post_type","post_status","post_date","post_category","post_thumbnail","post_excerpt","post_content"';
-		$this -> saveLine($titols);
+		$this -> saveLine($this -> title);
 	}
 
 }

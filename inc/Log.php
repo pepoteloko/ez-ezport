@@ -11,8 +11,10 @@ class Log {
 	const FILE_PATH = "files/";
 
 	private $fichero;
+	private $name;
 
-	public function __construct() {
+	public function __construct($name = 'error') {
+		$this -> name = $name;
 		// Initial values
 		$this -> cleanDirectory();
 		$this -> startFile();
@@ -30,7 +32,7 @@ class Log {
 	 * @param string $text
 	 */
 	public function writeLineError(Line $line, $txt) {
-		$text = '[' . $line->getID() . '] ' . substr($line -> getTitle(), 0, 40) . ": $txt";
+		$text = '[' . $line->getID() . '] ' . substr($line -> getTitle(), 0, 50) . ": $txt";
 		fwrite($this -> fichero, $text . "\n");
 	}
 
@@ -40,7 +42,7 @@ class Log {
 	 * Deletes all the files from the export directory
 	 */
 	private function cleanDirectory() {
-		$files = glob(self::FILE_PATH . '*.log'); // get all file names
+		$files = glob(self::FILE_PATH . $this -> name . '.log'); // get all file names
 		foreach($files as $file) { // iterate files
 			if(is_file($file))
 				unlink($file); // delete file
@@ -49,8 +51,8 @@ class Log {
 
 	private function startFile() {
 		// Obrir
-		echo "\t\t<p>Creado fichero error.log</p>\n";
-		$this -> fichero = fopen(self::FILE_PATH . "error.log", "w");
+		echo "\t\t<p>Creado fichero " . $this -> name . ".log</p>\n";
+		$this -> fichero = fopen(self::FILE_PATH . $this -> name . ".log", "w");
 	}
 
 }

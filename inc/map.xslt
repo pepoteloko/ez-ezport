@@ -35,11 +35,11 @@
 	</xsl:template>
 	<xsl:template match="link">
 		<xsl:element name="a">
-			<xsl:attribute name="href">
-				<xsl:value-of select="@url_id"/>
-			</xsl:attribute>
 			<xsl:attribute name="target">
 				<xsl:value-of select="@target"/>
+			</xsl:attribute>
+			<xsl:attribute name="href">
+				<xsl:value-of select="@url_id"/>
 			</xsl:attribute>
 			<xsl:apply-templates />
 		</xsl:element>
