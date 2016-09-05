@@ -39,7 +39,8 @@ class LineAgenda extends Line {
 	 * @return string
 	 */
 	public function getStartTime() {
-		$time = DateTime::createFromFormat('U', $this -> published, new DateTimeZone('Europe/Madrid'));
+		$time = DateTime::createFromFormat('U', $this -> published, new DateTimeZone('UTC'));
+		$time -> setTimezone(new DateTimeZone('Europe/Madrid'));
 		return $time -> format('H:i:s');
 	}
 
