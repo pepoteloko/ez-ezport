@@ -101,7 +101,7 @@
 						$line -> setLong($row -> data_text);
 						break;
 					case 'fecha':
-						$line -> setPublished($row -> published);
+						$line -> setPublished($row -> data_int);
 						break;
 				}
 			}
