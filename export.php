@@ -33,12 +33,13 @@
 
 		/* Consultas de selección que devuelven un conjunto de resultados */
 		$largo = true;
+		$newsCategory = 30;
 		if ($largo) {
 			$query = "SELECT o.id,o.name,o.section_id,a.data_int,a.data_text ,a.data_type_string,a.version,c.identifier, published
 				FROM ezcontentobject o inner join ezcontentobject_attribute a on o.id = a.contentobject_id
 				inner join ezcontentclass_attribute c on a.contentclassattribute_id = c.id
 				WHERE o.current_version = a.version -- Coje la versión actual
-				AND o.contentclass_id = 30 -- Filtra por noticias
+				AND o.contentclass_id = $newsCategory -- Filtra por noticias
 				AND status = 1;";
 		} else {
 			$query = "SELECT o.id,o.name,o.section_id,a.data_int,a.data_text ,a.data_type_string,a.version,c.identifier, published
@@ -108,7 +109,7 @@
 
 			$result -> close();
 
-			// L'últim queda penjat
+			// El último a veces queda colgado
 			try {
 				$fichero -> saveLine($line -> printLineCSV());
 			} catch (Exception $e) {
